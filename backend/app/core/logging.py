@@ -104,3 +104,10 @@ def configure_logging() -> None:
 def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
     """모듈에서 사용할 logger 인스턴스."""
     return structlog.get_logger(name)
+
+
+# Alias for backward compatibility with main.py (Unit 2)
+def setup_logging(debug: bool = False, **kwargs):
+    """Wrapper for configure_logging that accepts debug parameter."""
+    configure_logging()
+

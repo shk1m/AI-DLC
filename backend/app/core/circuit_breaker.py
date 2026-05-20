@@ -228,3 +228,11 @@ def reset_circuit_breakers() -> None:
 def clear_circuit_breakers() -> None:
     """테스트에서 레지스트리 비움."""
     _registry.clear()
+
+
+# --- Pre-defined instances for Unit 2 adapters ---
+kamis_cb = get_circuit_breaker("kamis", failure_threshold=5, recovery_timeout=30)
+public_data_cb = get_circuit_breaker("public_data", failure_threshold=5, recovery_timeout=30)
+naver_cb = get_circuit_breaker("naver", failure_threshold=5, recovery_timeout=30)
+neptune_cb = get_circuit_breaker("neptune", failure_threshold=3, recovery_timeout=60)
+bedrock_cb = get_circuit_breaker("bedrock", failure_threshold=3, recovery_timeout=60)
