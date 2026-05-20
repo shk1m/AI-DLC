@@ -1,1 +1,11 @@
-"""Business logic services (Unit 2/3 영역. Unit 4는 인터페이스만 참조)."""
+"""Business logic services."""
+
+from app.services.price_service import PriceService
+from app.services.recipe_service import RecipeService
+from app.services.news_service import NewsService
+
+__all__ = [
+    "PriceService",
+    "RecipeService",
+    "NewsService",
+]
