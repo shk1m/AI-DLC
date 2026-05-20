@@ -1,12 +1,11 @@
 'use client';
 
 /**
- * FE-02 — PriceChart
+ * FE-02 — PriceChart (Single-Screen Compact)
  * ────────────────────────────────────────────────────────────────────────────
- * - mockApi.fetchPriceSeries(selectedIngredientId)
- * - Recharts LineChart (도매·소매 라인) + ReferenceDot (Spike)
- * - CustomTooltip 으로 일반 시점/Spike 시점 분기 렌더링 (뉴스 헤드라인 포함)
- * - KPI 미니카드 (현재가 / 평균 / 최저 / 최고 / 변동률 / Spike 횟수)
+ * - Header (제목 + 범례)
+ * - KPI strip — 가로 한 줄, 슬림
+ * - LineChart — flex-1 로 남은 영역 모두 차지 (ResponsiveContainer 100%)
  * ────────────────────────────────────────────────────────────────────────────
  */
 
@@ -58,10 +57,8 @@ export function PriceChart() {
   const summary = series?.summary;
   const unit = series?.unit ?? '';
 
-  // Spike 포인트만 추출 (ReferenceDot 용)
   const spikes = useMemo(() => points.filter((p) => p.isSpike), [points]);
 
-  // Y축 도메인 (도매/소매 모두 커버)
   const yDomain = useMemo<[number, number] | undefined>(() => {
     if (points.length === 0) return undefined;
     const values = points.flatMap((p) => [p.wholesale, p.retail]);
@@ -72,50 +69,50 @@ export function PriceChart() {
   }, [points]);
 
   return (
-    <BentoCard className="min-h-[440px]">
+    <BentoCard padding="sm">
       <SectionHeader
         title={series ? `${series.ingredientName} 시세 추이` : '시세 추이'}
-        description="도매·소매. Spike 시점에 호버하면 관련 뉴스가 함께 표시됩니다."
+        description="도매·소매 30일. Spike 지점에 호버하면 관련 뉴스가 표시됩니다."
         icon={<LineChartIcon className="h-4 w-4" />}
+        size="sm"
         trailing={<ChartLegend />}
       />
 
-      {/* KPI 미니 카드 */}
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <KpiCard
+      {/* KPI strip — 슬림한 가로 1줄 */}
+      <div className="mt-3 grid shrink-0 grid-cols-4 gap-2">
+        <KpiStat
           label="현재가"
           value={summary ? formatKRW(summary.current) : null}
-          subLabel={unit ? `/ ${unit}` : ''}
+          sub={unit ? `/ ${unit}` : ''}
+          deltaRate={summary?.changeRate}
           loading={loading}
           accent
-          deltaRate={summary?.changeRate}
         />
-        <KpiCard
-          label="구간 평균"
+        <KpiStat
+          label="평균"
           value={summary ? formatKRW(summary.average) : null}
-          subLabel={summary ? `${summary.range} 평균` : ''}
+          sub={summary ? summary.range : ''}
           loading={loading}
         />
-        <KpiCard
+        <KpiStat
           label="최저"
           value={summary ? formatKRW(summary.min) : null}
-          subLabel="기간 내"
           loading={loading}
         />
-        <KpiCard
-          label="최고 / Spike"
+        <KpiStat
+          label="최고"
           value={summary ? formatKRW(summary.max) : null}
-          subLabel={summary ? `Spike ${summary.spikeCount}회` : ''}
+          sub={summary ? `Spike ${summary.spikeCount}회` : ''}
           loading={loading}
           warning
         />
       </div>
 
-      {/* 차트 영역 */}
-      <div className="relative mt-4 flex-1">
+      {/* 차트 영역 — flex-1 로 남은 공간 전부 사용 */}
+      <div className="relative mt-3 min-h-0 flex-1">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center rounded-lg border border-dashed border-ink-200 bg-white/60">
-            <Skeleton className="h-[260px] w-[95%]" />
+            <Skeleton className="h-[80%] w-[95%]" />
           </div>
         )}
 
@@ -126,10 +123,10 @@ export function PriceChart() {
         )}
 
         {!loading && !error && points.length > 0 && (
-          <ResponsiveContainer width="100%" height="100%" minHeight={260}>
+          <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={points}
-              margin={{ top: 12, right: 12, left: 0, bottom: 4 }}
+              margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
               onMouseMove={(state) => {
                 const date = state?.activePayload?.[0]?.payload?.date as string | undefined;
                 if (date) setFocusedDate(date);
@@ -146,19 +143,20 @@ export function PriceChart() {
               <XAxis
                 dataKey="date"
                 tickFormatter={formatShortDate}
-                tick={{ fontSize: 11, fill: '#8b95a2' }}
+                tick={{ fontSize: 10, fill: '#8b95a2' }}
                 stroke="#dadfe6"
                 interval="preserveStartEnd"
-                minTickGap={24}
+                minTickGap={28}
+                tickMargin={6}
               />
               <YAxis
                 domain={yDomain ?? ['auto', 'auto']}
-                tick={{ fontSize: 11, fill: '#8b95a2' }}
+                tick={{ fontSize: 10, fill: '#8b95a2' }}
                 stroke="#dadfe6"
                 tickFormatter={(v: number) =>
                   v >= 10000 ? `${Math.round(v / 1000)}k` : `${v}`
                 }
-                width={48}
+                width={42}
               />
               <Tooltip
                 cursor={{ stroke: '#b6bec9', strokeDasharray: '4 4' }}
@@ -189,13 +187,12 @@ export function PriceChart() {
                 animationDuration={500}
               />
 
-              {/* Spike 마커 */}
               {spikes.map((p) => (
                 <ReferenceDot
                   key={p.date}
                   x={p.date}
                   y={p.wholesale}
-                  r={6}
+                  r={5}
                   fill={p.spike?.direction === 'up' ? '#ef4444' : '#3b82f6'}
                   stroke="#fff"
                   strokeWidth={2}
@@ -216,76 +213,83 @@ export function PriceChart() {
 
 function ChartLegend() {
   return (
-    <div className="flex items-center gap-3 text-[11px] text-ink-500">
-      <span className="inline-flex items-center gap-1.5">
-        <span className="inline-block h-0.5 w-4 rounded-full bg-brand-500" />
+    <div className="flex items-center gap-2 text-[10px] text-ink-500">
+      <span className="inline-flex items-center gap-1">
+        <span className="inline-block h-0.5 w-3 rounded-full bg-brand-500" />
         도매
       </span>
-      <span className="inline-flex items-center gap-1.5">
-        <span className="inline-block h-0.5 w-4 rounded-full bg-blue-500" />
+      <span className="inline-flex items-center gap-1">
+        <span className="inline-block h-0.5 w-3 rounded-full bg-blue-500" />
         소매
       </span>
-      <span className="inline-flex items-center gap-1 text-spike-up">
-        <Sparkles className="h-3 w-3" />
+      <span className="inline-flex items-center gap-0.5 text-spike-up">
+        <Sparkles className="h-2.5 w-2.5" />
         Spike
       </span>
     </div>
   );
 }
 
-function KpiCard({
+function KpiStat({
   label,
   value,
-  subLabel,
+  sub,
+  deltaRate,
   loading,
   accent,
   warning,
-  deltaRate,
 }: {
   label: string;
   value: string | null;
-  subLabel?: string;
+  sub?: string;
+  deltaRate?: number;
   loading?: boolean;
   accent?: boolean;
   warning?: boolean;
-  deltaRate?: number;
 }) {
   return (
     <div
       className={cn(
-        'flex flex-col gap-1 rounded-lg border bg-white px-3 py-2.5',
-        accent ? 'border-brand-200 bg-gradient-to-br from-brand-50/60 to-white' : 'border-ink-100',
-        warning && 'border-amber-200 bg-gradient-to-br from-amber-50/60 to-white',
+        'flex flex-col gap-0.5 rounded-md border px-2.5 py-1.5',
+        accent
+          ? 'border-brand-200 bg-gradient-to-br from-brand-50/60 to-white'
+          : warning
+            ? 'border-amber-200 bg-gradient-to-br from-amber-50/60 to-white'
+            : 'border-ink-100 bg-white',
       )}
     >
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">
         {label}
       </span>
       {loading ? (
-        <Skeleton className="h-5 w-20" />
+        <Skeleton className="h-4 w-16" />
       ) : (
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-base font-bold tabular-nums tracking-tight text-ink-900">
+        <div className="flex items-baseline gap-1">
+          <span className="truncate text-[13px] font-bold tabular-nums leading-tight tracking-tight text-ink-900">
             {value ?? '—'}
           </span>
           {typeof deltaRate === 'number' && (
             <span
               className={cn(
-                'inline-flex items-center gap-0.5 text-[11px] font-semibold',
-                deltaRate > 0 ? 'text-spike-up' : deltaRate < 0 ? 'text-spike-down' : 'text-ink-400',
+                'inline-flex shrink-0 items-center text-[10px] font-semibold',
+                deltaRate > 0
+                  ? 'text-spike-up'
+                  : deltaRate < 0
+                    ? 'text-spike-down'
+                    : 'text-ink-400',
               )}
             >
               {deltaRate > 0 ? (
-                <ArrowUpRight className="h-3 w-3" />
+                <ArrowUpRight className="h-2.5 w-2.5" />
               ) : deltaRate < 0 ? (
-                <ArrowDownRight className="h-3 w-3" />
+                <ArrowDownRight className="h-2.5 w-2.5" />
               ) : null}
               {formatRate(deltaRate)}
             </span>
           )}
         </div>
       )}
-      {subLabel && <span className="text-[10px] text-ink-400">{subLabel}</span>}
+      {sub && <span className="truncate text-[9px] text-ink-400">{sub}</span>}
     </div>
   );
 }

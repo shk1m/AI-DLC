@@ -1,13 +1,7 @@
 'use client';
 
 /**
- * FE-04 — PriceTable
- * ────────────────────────────────────────────────────────────────────────────
- * - 선택된 재료의 최근 7일 도매/소매/Gap 시세
- * - 변동률 컬러링
- * - 호버/클릭 시 setFocusedDate (차트 cursor 와 동기화)
- * - Spike 행은 좌측 라인 강조
- * ────────────────────────────────────────────────────────────────────────────
+ * FE-04 — PriceTable (Single-Screen Compact)
  */
 
 import { ArrowDownRight, ArrowUpRight, Table as TableIcon } from 'lucide-react';
@@ -43,17 +37,17 @@ export function PriceTable() {
   const recent = (series?.points ?? []).slice(-RECENT_DAYS).reverse();
 
   return (
-    <BentoCard className="min-h-[280px]">
+    <BentoCard padding="sm">
       <SectionHeader
         title="최근 7일 도매 / 소매 / Gap"
-        description={
-          series ? `${series.ingredientName} (${series.unit})` : '재료별 일자 시세 비교'
-        }
+        description={series ? `${series.ingredientName} (${series.unit})` : '일자별 시세 비교'}
         icon={<TableIcon className="h-4 w-4" />}
+        size="sm"
       />
 
-      <div className="mt-4 flex flex-col">
-        <div className="grid grid-cols-[80px_1fr_1fr_1fr_70px] items-center gap-2 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink-400">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col">
+        {/* 헤더 행 */}
+        <div className="grid shrink-0 grid-cols-[56px_1fr_1fr_1fr_64px] items-center gap-2 border-b border-ink-100 px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wide text-ink-400">
           <span>날짜</span>
           <span className="text-right">도매</span>
           <span className="text-right">소매</span>
@@ -61,18 +55,18 @@ export function PriceTable() {
           <span className="text-right">변동</span>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="scroll-thin flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto pt-1">
           {loading &&
             Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="grid grid-cols-[80px_1fr_1fr_1fr_70px] items-center gap-2 rounded-lg px-3 py-2"
+                className="grid shrink-0 grid-cols-[56px_1fr_1fr_1fr_64px] items-center gap-2 px-2 py-1.5"
               >
-                <Skeleton className="h-4 w-12" />
-                <Skeleton className="h-4 w-16 justify-self-end" />
-                <Skeleton className="h-4 w-16 justify-self-end" />
-                <Skeleton className="h-4 w-12 justify-self-end" />
-                <Skeleton className="h-4 w-10 justify-self-end" />
+                <Skeleton className="h-3.5 w-10" />
+                <Skeleton className="h-3.5 w-14 justify-self-end" />
+                <Skeleton className="h-3.5 w-14 justify-self-end" />
+                <Skeleton className="h-3.5 w-10 justify-self-end" />
+                <Skeleton className="h-3.5 w-8 justify-self-end" />
               </div>
             ))}
 
@@ -89,19 +83,19 @@ export function PriceTable() {
                   onMouseLeave={() => setFocusedDate(null)}
                   onClick={() => setFocusedDate(p.date)}
                   className={cn(
-                    'group relative grid grid-cols-[80px_1fr_1fr_1fr_70px] items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-all',
-                    focused ? 'bg-brand-50' : 'bg-white hover:bg-ink-50',
+                    'group relative grid shrink-0 grid-cols-[56px_1fr_1fr_1fr_64px] items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12px] transition-all',
+                    focused ? 'bg-brand-50' : 'hover:bg-ink-50',
                   )}
                 >
                   {p.isSpike && (
                     <span
                       className={cn(
-                        'absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full',
+                        'absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-r-full',
                         p.spike?.direction === 'up' ? 'bg-spike-up' : 'bg-spike-down',
                       )}
                     />
                   )}
-                  <span className="text-xs font-medium text-ink-600">
+                  <span className="text-[11px] font-medium text-ink-600">
                     {formatShortDate(p.date)}
                   </span>
                   <span className="text-right font-semibold tabular-nums text-ink-900">
@@ -115,14 +109,14 @@ export function PriceTable() {
                   </span>
                   <span
                     className={cn(
-                      'inline-flex items-center justify-end gap-0.5 text-right text-xs font-semibold tabular-nums',
+                      'inline-flex items-center justify-end gap-0.5 text-right text-[11px] font-semibold tabular-nums',
                       isUp ? 'text-spike-up' : isDown ? 'text-spike-down' : 'text-ink-400',
                     )}
                   >
                     {isUp ? (
-                      <ArrowUpRight className="h-3 w-3" />
+                      <ArrowUpRight className="h-2.5 w-2.5" />
                     ) : isDown ? (
-                      <ArrowDownRight className="h-3 w-3" />
+                      <ArrowDownRight className="h-2.5 w-2.5" />
                     ) : null}
                     {formatRate(p.changeRate ?? 0)}
                   </span>
@@ -131,7 +125,7 @@ export function PriceTable() {
             })}
 
           {!loading && recent.length === 0 && (
-            <div className="rounded-lg border border-dashed border-ink-200 px-3 py-6 text-center text-xs text-ink-400">
+            <div className="rounded-md border border-dashed border-ink-200 px-3 py-4 text-center text-[11px] text-ink-400">
               표시할 시세 데이터가 없습니다
             </div>
           )}
