@@ -64,10 +64,30 @@
 3. **외부 의존 격리**: 모든 외부 API는 Adapter를 통해 접근 (Fallback/캐싱 용이)
 4. **단방향 의존**: 서비스 간 순환 의존 금지, 계층 구조 준수
 5. **IT 비전문가 UX**: 모든 프론트엔드 컴포넌트는 직관적이고 단순한 인터랙션
+6. **Lambda 분리 (비동기 작업)**: 장시간 AI 추론(메뉴 생성 등)은 AWS Lambda로 분리하여 메인 FastAPI 응답성 보호
 
 ---
 
-## 5. 상세 문서 참조
+## 5. 비동기/배치 작업 아키텍처 (Lambda)
+
+Application Design의 "모놀리식 FastAPI" 결정을 유지하되, 다음 작업은 Lambda로 분리:
+
+| 컴포넌트 | 위치 | 용도 | 근거 |
+|----------|------|------|------|
+| lambda_handler.py | backend/ | Bedrock 메뉴 생성 비동기 처리 | AI 추론 10~30초 소요, FastAPI 응답 블로킹 방지 |
+| template.yaml | backend/ | SAM 배포 템플릿 | Infrastructure as Code |
+| deploy.sh | backend/ | Lambda 배포 스크립트 | 자동화 |
+
+### Lambda 호출 패턴
+```
+FastAPI (동기 요청) → SQS/직접 호출 → Lambda (비동기 처리) → S3/RDS 결과 저장
+                                                              ↓
+                                                    클라이언트 폴링 또는 WebSocket 알림
+```
+
+---
+
+## 6. 상세 문서 참조
 
 - 컴포넌트 정의: [components.md](./components.md)
 - 메서드 시그니처: [component-methods.md](./component-methods.md)

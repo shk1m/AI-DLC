@@ -122,60 +122,118 @@
 
 ---
 
-## 코드 조직 전략 (Greenfield)
+## 코드 조직 전략 (Greenfield) - 실제 구현 반영
 
 ```
 project-root/
-├── frontend/                    # Unit 1: Next.js 14
-│   ├── app/
-│   │   └── page.tsx            # 메인 대시보드
-│   ├── components/
-│   │   ├── dashboard/          # DashboardLayout, CategoryFilter
-│   │   ├── charts/             # PriceChart, PriceTable
-│   │   ├── chat/               # ChatBot
-│   │   ├── simulator/          # CostSimulator
-│   │   └── substitute/         # SubstituteRecommender
-│   ├── hooks/                  # Custom hooks
-│   ├── lib/                    # API client, WebSocket
-│   ├── types/                  # TypeScript 타입 정의
-│   └── package.json
+├── .env.example                     # 환경 변수 템플릿 (루트)
+├── .gitignore                       # 루트 gitignore
+├── docker-compose.yml               # 전체 인프라 (PostgreSQL, Redis)
 │
-├── backend/                     # Unit 2 + 3 + 4: FastAPI
+├── frontend/                        # Unit 1: Next.js 14
 │   ├── app/
-│   │   ├── main.py             # FastAPI 앱 진입점
-│   │   ├── routers/            # API 라우터
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx                # 메인 대시보드
+│   ├── components/
+│   │   ├── dashboard/              # FE-01~FE-07 컴포넌트
+│   │   │   ├── DashboardLayout.tsx
+│   │   │   ├── CategoryFilter.tsx
+│   │   │   ├── PriceChart.tsx
+│   │   │   ├── PriceChartTooltip.tsx
+│   │   │   ├── PriceTable.tsx
+│   │   │   ├── CostSimulator.tsx
+│   │   │   ├── SubstituteRecommender.tsx
+│   │   │   └── ChatBot.tsx
+│   │   └── ui/                     # 공통 UI 컴포넌트
+│   │       ├── BentoCard.tsx
+│   │       ├── SectionHeader.tsx
+│   │       └── SkeletonCard.tsx
+│   ├── lib/                        # 유틸리티, 상태, API
+│   │   ├── chatStream.ts           # WebSocket 스트리밍
+│   │   ├── hooks.ts                # Custom hooks
+│   │   ├── mockApi.ts              # Mock API (시연용)
+│   │   ├── mockData.ts             # Mock 데이터
+│   │   ├── store.ts                # Zustand 상태 관리
+│   │   └── utils.ts                # 유틸리티 함수
+│   ├── types/
+│   │   └── index.ts                # TypeScript 타입 정의 (API 계약)
+│   ├── package.json
+│   ├── tailwind.config.ts
+│   └── tsconfig.json
+│
+├── backend/                         # Unit 2 + 3 + 4: FastAPI
+│   ├── app/
+│   │   ├── main.py                 # FastAPI 앱 진입점
+│   │   ├── config.py               # 앱 설정 (Unit 2)
+│   │   ├── database.py             # DB 연결 (Unit 3)
+│   │   ├── routers/                # API 라우터 (Unit 2)
 │   │   │   ├── prices.py
 │   │   │   ├── chat.py
 │   │   │   ├── recipes.py
-│   │   │   ├── substitutes.py
-│   │   │   ├── news.py
-│   │   │   └── ontology.py
-│   │   ├── services/           # 비즈니스 로직
+│   │   │   └── news.py
+│   │   ├── services/               # 비즈니스 로직 (Unit 2 + 3)
 │   │   │   ├── price_service.py
-│   │   │   ├── chat_service.py
 │   │   │   ├── recipe_service.py
-│   │   │   ├── substitute_service.py
 │   │   │   ├── news_service.py
-│   │   │   └── ontology_service.py
-│   │   ├── agents/             # LangChain Agent
-│   │   │   ├── agent.py
-│   │   │   └── tools/
-│   │   ├── models/             # SQLAlchemy 모델
-│   │   ├── schemas/            # Pydantic 스키마
-│   │   ├── adapters/           # 외부 API 어댑터
-│   │   │   ├── kamis.py
-│   │   │   ├── public_data.py
-│   │   │   ├── naver.py
-│   │   │   └── crawler.py
-│   │   ├── db/                 # DB 설정, 마이그레이션
-│   │   └── config.py           # 환경 설정
-│   ├── tests/
-│   └── requirements.txt
+│   │   │   ├── bedrock_client.py       # Unit 3: Bedrock 연동
+│   │   │   └── menu_generation_service.py  # Unit 3: AI 메뉴 생성
+│   │   ├── models/                 # SQLAlchemy 모델 (Unit 2)
+│   │   │   ├── food_item.py
+│   │   │   ├── price_record.py
+│   │   │   ├── spike_event.py
+│   │   │   ├── news_article.py
+│   │   │   ├── recipe.py
+│   │   │   └── chat.py
+│   │   ├── schemas/                # Pydantic 스키마 (Unit 2 + 4)
+│   │   │   ├── price.py
+│   │   │   ├── recipe.py
+│   │   │   ├── news.py
+│   │   │   └── common.py
+│   │   ├── adapters/               # 외부 API 어댑터 (Unit 2 + 4)
+│   │   │   ├── base.py             # 어댑터 인터페이스
+│   │   │   ├── kamis.py            # Unit 2: KAMIS API
+│   │   │   ├── naver.py            # Unit 2: 네이버 API
+│   │   │   ├── public_data.py      # Unit 2: 공공데이터
+│   │   │   ├── crawler.py          # Unit 4: 뉴스 크롤러
+│   │   │   └── s3_client.py        # Unit 4: S3 클라이언트
+│   │   ├── core/                   # Cross-cutting (Unit 4)
+│   │   │   ├── aws.py              # AWS 클라이언트 (Unit 2)
+│   │   │   ├── cache.py            # 캐시 (Unit 2 버전)
+│   │   │   ├── cache_manager.py    # 캐시 매니저 (Unit 4 버전)
+│   │   │   ├── circuit_breaker.py  # 회로 차단기
+│   │   │   ├── config.py           # Core 설정
+│   │   │   ├── fallback.py         # Fallback 로직
+│   │   │   ├── logging.py          # 구조화 로깅
+│   │   │   └── middleware.py       # 미들웨어 (Correlation ID 등)
+│   │   └── db/                     # DB 설정 (Unit 2)
+│   │       └── base.py
+│   ├── alembic/                    # DB 마이그레이션 (Unit 2)
+│   ├── scripts/                    # 데이터 적재 스크립트 (Unit 4)
+│   │   ├── seed_demo_data.py
+│   │   ├── load_ontology.py
+│   │   └── verify_setup.py
+│   ├── tests/                      # 테스트 (Unit 4)
+│   │   ├── conftest.py
+│   │   ├── unit/                   # 단위 테스트 + PBT
+│   │   └── integration/            # 통합 테스트
+│   ├── lambda_handler.py           # Unit 3: Lambda 핸들러
+│   ├── template.yaml               # Unit 3: SAM 템플릿
+│   ├── deploy.sh                   # Unit 3: 배포 스크립트
+│   ├── init_db.sql                 # Unit 3: DB 초기화
+│   ├── docker-compose.yml          # 백엔드 전용 Docker
+│   ├── requirements.txt            # 의존성 (버전 고정)
+│   └── pyproject.toml              # 프로젝트 메타데이터
 │
-├── data/                        # Unit 4: 샘플/시연 데이터
-│   ├── ontology/               # Neptune 적재용 데이터
-│   ├── sample/                 # Mock/샘플 데이터
-│   └── scripts/                # 데이터 적재 스크립트
+├── data/                            # Unit 4: 샘플/시연 데이터
+│   ├── ontology/                   # Neptune 적재용 데이터
+│   │   ├── food_nodes.json         # 45개 식자재 노드
+│   │   └── food_edges.json         # 30개 관계 엣지
+│   └── news/samples/               # 뉴스 샘플 데이터
+│       ├── naver_news.json
+│       ├── mafra_news.json
+│       └── mof_news.json
 │
-└── docs/                        # 프로젝트 문서 (README 등)
+├── aidlc-docs/                      # AI-DLC 문서
+└── .kiro/                           # AI-DLC 규칙
 ```

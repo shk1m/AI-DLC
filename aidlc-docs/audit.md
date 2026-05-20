@@ -302,3 +302,14 @@
 **Context**: CONSTRUCTION - Code Generation Steps 2~4 complete. All FE-01~FE-07 components live. Step 5 (polish: motion micro-interactions, a11y, demo scenario richness) remains optional.
 
 ---
+
+
+---
+
+## Integration Merge - All Units to Main
+**Timestamp**: 2026-05-20T10:30:00Z
+**User Input**: "제안해 주신 추천 PR/Merge 전략을 단계적으로 적용해 주세요."
+**AI Response**: "Executed 4-unit sequential merge strategy: unit01(Frontend) → unit04(Cross-cutting) → unit03(AI/Data) → unit02(Backend). Resolved conflicts in .gitignore, audit.md, requirements.txt, README.md, adapters/__init__.py, schemas/__init__.py, services/__init__.py, circuit_breaker.py, logging.py, config.py, news.py, price_service.py. Fixed accidentally renamed .kiro/aws-aidlc-rule-details/construction directory. Pushed to origin/main."
+**Context**: CONSTRUCTION - Code Generation. All 4 units merged into main. 140 files changed, +18,763 lines.
+
+---
