@@ -152,3 +152,21 @@ data/
 - `.env` 파일은 git에 커밋하지 마세요 (`.gitignore`에 명시됨)
 - Naver API 자격증명이 노출됐다면 [네이버 개발자 센터](https://developers.naver.com/apps)에서 즉시 Secret 갱신
 - AWS 자격증명은 IAM 최소 권한 원칙 적용 (infrastructure-design.md §5 참조)
+
+
+## 🤖 AI/Lambda Services (Unit 03)
+
+### Bedrock 메뉴 생성 서비스
+- `app/services/bedrock_client.py` - Amazon Bedrock Claude 연동
+- `app/services/menu_generation_service.py` - AI 기반 메뉴/레시피 생성
+- `app/services/price_service.py` - 시세 데이터 조회 (Unit 03 버전)
+
+### Lambda 배포 (비동기 작업용)
+- `lambda/lambda_handler.py` - Lambda 핸들러
+- `lambda/template.yaml` - SAM 템플릿
+- `lambda/deploy.sh` - 배포 스크립트
+
+### 로컬 테스트
+```bash
+python test_local.py
+```
