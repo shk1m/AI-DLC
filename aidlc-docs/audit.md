@@ -220,3 +220,53 @@
 **Context**: CONSTRUCTION - Infrastructure Design complete. No questions needed (AWS services already decided).
 
 ---
+
+## Infrastructure Design - Approval & Unit 4 Selection
+**Timestamp**: 2026-05-20T09:26:00Z
+**User Input**: "현재 프로젝트 구조는 AI-DLC 방법론을 활용해서 계획되어 있습니다.Construction 단계의 인프라 설계가지 완료가 된 상태입니다.현재까지 설계된 사항을 분석해 주세요그리고 저는 현재 프로젝트에서 Backend에서 Unit 4의 역할을 담당하고 있습니다.Unit4의 역할과 구현해야할 컴포넌트를 분석해 주세요."
+**AI Response**: "Analyzed all design artifacts (requirements, components, services, methods, dependencies, business logic, NFR, infrastructure). Summarized Unit 4 (Integration) responsibilities: NewsCrawler (EXT-04), S3 Client (DL-04), Cross-cutting (CircuitBreaker/CacheManager/Fallback), Demo Data + Seeding, Integration Tests, Deployment Artifacts."
+**Context**: CONSTRUCTION - Infrastructure Design implicitly approved; user selected Unit 4 as their assignment.
+
+---
+
+## Code Generation - Part 1 Planning Started (Unit 4)
+**Timestamp**: 2026-05-20T09:27:00Z
+**User Input**: "네, 다음 단계를 진행해주세요."
+**AI Response**: "Proceeding to CONSTRUCTION - Code Generation Part 1 (Planning) for Unit 4 (Integration). Reading workspace state, story map, and unit dependencies."
+**Context**: CONSTRUCTION - Code Generation Part 1 (Planning) start. Unit: Unit 4 (Integration).
+
+---
+
+## Code Generation - Part 1 Plan Created (Unit 4)
+**Timestamp**: 2026-05-20T09:28:00Z
+**AI Response**: "Created Unit 4 code generation plan at aidlc-docs/construction/plans/unit-4-integration-code-generation-plan.md. 23 numbered steps across 8 phases (Setup, Cross-cutting, Schemas, Adapters, Demo Data, Integration Tests, Deployment, Documentation). Includes traceability matrix (Step ↔ Story ↔ NFR ↔ Acceptance), Extension compliance (Security Baseline + PBT), risk mitigations. Awaiting user approval before Part 2 (Generation)."
+**Context**: CONSTRUCTION - Code Generation Part 1 (Planning) complete for Unit 4. Awaiting explicit approval for Part 2.
+
+---
+
+## Code Generation - Part 1 Approval Request
+**Timestamp**: 2026-05-20T09:29:00Z
+**AI Response**: "Presented plan summary to user with 2-option workflow message (Request Changes / Continue to Part 2). Awaiting response."
+**Context**: CONSTRUCTION - Code Generation Part 1. Awaiting user approval.
+
+---
+
+## Code Generation - Part 2 Complete (Unit 4)
+**Timestamp**: 2026-05-20T10:15:00Z
+**User Input**: "제한 시간이 거의 다 되어갑니다. 웹서비스의 중간 점검을 위해 이제 unit04에 push하고, main 브랜치로 pull request를 해야합니다. 속도를 더 내어 다음 단계로 진행해주세요."
+**AI Response**: "All 23 steps completed. 97 unit tests pass. Proceeding to git commit/push/PR on unit04 branch."
+**Context**: CONSTRUCTION - Code Generation Part 2 complete for Unit 4. Naver API credentials recorded (stored in .env only, not committed).
+
+### Generated Files Summary
+- **Core (6)**: config.py, logging.py, middleware.py, cache_manager.py, circuit_breaker.py, fallback.py
+- **Adapters (2)**: crawler.py (EXT-04), s3_client.py (DL-04)
+- **Schemas (1)**: news.py (NewsArticle + PBT)
+- **Scripts (3)**: seed_demo_data.py, load_ontology.py, verify_setup.py
+- **Data (5)**: food_nodes.json (45 nodes), food_edges.json (30 edges), 3x news samples
+- **Deployment (3)**: docker-compose.yml, .env.example, .gitignore
+- **Tests (8 files, 97 tests)**: unit tests + PBT (Hypothesis)
+- **Docs**: backend/README.md, 9x step summaries
+
+### Test Results: 97/97 PASSED
+
+---
