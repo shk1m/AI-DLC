@@ -1,0 +1,21 @@
+{
+  "cluster": "dlc-cluster",
+  "serviceName": "dlc-unit01-frontend",
+  "taskDefinition": "arn:aws:ecs:us-east-1:777836495456:task-definition/dlc-unit01-frontend:1",
+  "desiredCount": 1,
+  "launchType": "FARGATE",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": ["subnet-0ccd1f9c1b50e60c4", "subnet-049e22710f4cf19b8"],
+      "securityGroups": ["sg-05f41d6c19888fb50"],
+      "assignPublicIp": "ENABLED"
+    }
+  },
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:777836495456:targetgroup/dlc-unit01-frontend-tg/f56a02bc3c46fdf7",
+      "containerName": "frontend",
+      "containerPort": 3000
+    }
+  ]
+}
