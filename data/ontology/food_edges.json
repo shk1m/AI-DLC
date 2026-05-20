@@ -1,0 +1,34 @@
+[
+  {"from": "fish-mackerel",   "to": "fish-spanish",    "relation": "SUBSTITUTABLE",       "similarity": 0.85, "reason": "같은 등푸른 생선, 조리법 유사"},
+  {"from": "fish-mackerel",   "to": "fish-hairtail",   "relation": "SUBSTITUTABLE",       "similarity": 0.70, "reason": "조리 호환 (조림/구이)"},
+  {"from": "fish-spanish",    "to": "fish-mackerel",   "relation": "SUBSTITUTABLE",       "similarity": 0.85, "reason": "같은 등푸른 생선"},
+  {"from": "fish-hairtail",   "to": "fish-spanish",    "relation": "SUBSTITUTABLE",       "similarity": 0.72, "reason": "흰살 생선 대체 가능"},
+  {"from": "fish-cod",        "to": "fish-hairtail",   "relation": "SUBSTITUTABLE",       "similarity": 0.65, "reason": "담백한 흰살 생선"},
+  {"from": "shrimp-fresh",    "to": "shellfish-abalone","relation": "SAME_CATEGORY",      "similarity": 0.50, "reason": "해산물 카테고리 동일"},
+  {"from": "shellfish-oyster","to": "shrimp-fresh",    "relation": "NUTRITION_SIMILAR",   "similarity": 0.60, "reason": "단백질 함량 유사"},
+
+  {"from": "veg-cabbage",     "to": "veg-spinach",     "relation": "SUBSTITUTABLE",       "similarity": 0.80, "reason": "쌈채소 호환, 영양 유사"},
+  {"from": "veg-cabbage",     "to": "veg-lettuce",     "relation": "SUBSTITUTABLE",       "similarity": 0.75, "reason": "쌈채소 호환"},
+  {"from": "veg-lettuce",     "to": "veg-perilla",     "relation": "SUBSTITUTABLE",       "similarity": 0.80, "reason": "쌈채소 상호 대체 가능"},
+  {"from": "veg-lettuce",     "to": "veg-spinach",     "relation": "SUBSTITUTABLE",       "similarity": 0.70, "reason": "엽채류 유사"},
+  {"from": "veg-spinach",     "to": "veg-lettuce",     "relation": "SUBSTITUTABLE",       "similarity": 0.70, "reason": "엽채류 유사"},
+  {"from": "veg-onion",       "to": "veg-green-onion", "relation": "SUBSTITUTABLE",       "similarity": 0.78, "reason": "향미채소 대체 가능"},
+  {"from": "veg-green-onion", "to": "veg-onion",       "relation": "SUBSTITUTABLE",       "similarity": 0.75, "reason": "향미채소 대체 가능"},
+  {"from": "veg-radish",      "to": "veg-carrot",      "relation": "NUTRITION_SIMILAR",   "similarity": 0.65, "reason": "근채류 영양 유사"},
+  {"from": "veg-potato",      "to": "veg-sweet-potato","relation": "SUBSTITUTABLE",       "similarity": 0.80, "reason": "구황작물 상호 대체 가능"},
+  {"from": "veg-sweet-potato","to": "veg-potato",      "relation": "SUBSTITUTABLE",       "similarity": 0.80, "reason": "구황작물 상호 대체 가능"},
+  {"from": "veg-garlic",      "to": "veg-ginger",      "relation": "COOKING_COMPATIBLE",  "similarity": 0.70, "reason": "양념류 함께 사용 빈도 높음"},
+  {"from": "veg-chili",       "to": "veg-tomato",      "relation": "SAME_CATEGORY",       "similarity": 0.55, "reason": "과채류 동일"},
+
+  {"from": "meat-pork-belly", "to": "meat-pork-neck",  "relation": "SUBSTITUTABLE",       "similarity": 0.85, "reason": "같은 돼지 부위, 구이 호환"},
+  {"from": "meat-pork-neck",  "to": "meat-pork-belly", "relation": "SUBSTITUTABLE",       "similarity": 0.85, "reason": "구이/볶음 호환"},
+  {"from": "meat-chicken",    "to": "meat-chicken-wing","relation": "SAME_CATEGORY",      "similarity": 0.90, "reason": "닭고기 부위"},
+  {"from": "meat-beef-korean","to": "meat-pork-belly",  "relation": "NUTRITION_SIMILAR",  "similarity": 0.55, "reason": "단백질 유사"},
+
+  {"from": "proc-soy-sauce",  "to": "proc-doenjang",   "relation": "COOKING_COMPATIBLE",  "similarity": 0.80, "reason": "발효 조미료 조합"},
+  {"from": "proc-doenjang",   "to": "proc-gochujang",  "relation": "COOKING_COMPATIBLE",  "similarity": 0.75, "reason": "전통 발효장류 조합"},
+  {"from": "proc-flour",      "to": "proc-rice",        "relation": "NUTRITION_SIMILAR",  "similarity": 0.65, "reason": "탄수화물 주원료 유사"},
+
+  {"from": "fruit-apple",     "to": "fruit-pear",      "relation": "SUBSTITUTABLE",       "similarity": 0.72, "reason": "과일 디저트/음료 대체"},
+  {"from": "fruit-strawberry","to": "fruit-watermelon","relation": "SAME_CATEGORY",       "similarity": 0.50, "reason": "국산과일 동일"}
+]

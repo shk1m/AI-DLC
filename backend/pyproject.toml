@@ -1,0 +1,86 @@
+[project]
+name = "foodlens-backend"
+version = "0.1.0"
+description = "AI-DLC FoodLens — MD/영양사/바이어용 AI 대시보드 + 챗봇 백엔드"
+requires-python = ">=3.11"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.git
+  | \.venv
+  | __pycache__
+  | \.pytest_cache
+  | data
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [".git", ".venv", "__pycache__", ".pytest_cache", "data"]
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle errors
+  "W",   # pycodestyle warnings
+  "F",   # pyflakes
+  "I",   # isort
+  "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "UP",  # pyupgrade
+  "S",   # bandit (security)
+  "T20", # flake8-print
+]
+ignore = [
+  "S101", # asserts permitted in tests
+  "B008", # function call in default argument (FastAPI Depends pattern)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S106"]
+"backend/scripts/**/*.py" = ["T201"]  # print 허용 (CLI)
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+  "--tb=short",
+]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+  "integration: 통합 테스트 (외부 서비스 mock 사용)",
+  "pbt: Property-based test (Hypothesis)",
+  "slow: 느린 테스트 (CI 제외 가능)",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+  "*/tests/*",
+  "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
