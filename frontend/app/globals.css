@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --topbar-h: 56px;
+  }
+
+  html,
+  body,
+  #__next {
+    height: 100%;
+  }
+
+  html,
+  body {
+    /* 한 판 대시보드 — 페이지 자체 스크롤 막고 카드 내부에서만 스크롤 */
+    overflow: hidden;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased;
+    font-feature-settings:
+      'ss01' on,
+      'cv11' on;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(36, 157, 98, 0.08), transparent 35%),
+      radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.06), transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(239, 68, 68, 0.05), transparent 35%);
+    background-attachment: fixed;
+  }
+
+  /* Recharts default tooltip 제거 — 우리 CustomTooltip 사용 */
+  .recharts-tooltip-wrapper {
+    outline: none;
+  }
+
+  /* 얇은 스크롤바 (카드 내부) */
+  .scroll-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scroll-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(218 223 230);
+    border-radius: 9999px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(182 190 201);
+  }
+}
+
+@layer components {
+  /* ───────────────────────────────────────────────────────────────────────
+     단일 화면 그리드 — 한 판에 모든 카드 배치
+     desktop ≥ 1280px:
+       cols: [filter 280px] [main 1fr] [aside 360px]
+       rows: [chart 1.55fr] [table 1fr]
+       filter는 세로 전체(2행) 차지
+  ─────────────────────────────────────────────────────────────────────── */
+  .one-screen-grid {
+    display: grid;
+    gap: 14px;
+    height: calc(100vh - var(--topbar-h));
+    padding: 14px;
+    grid-template-columns: 280px minmax(0, 1fr) 360px;
+    grid-template-rows: minmax(0, 1.55fr) minmax(0, 1fr);
+    grid-template-areas:
+      'filter chart  sim'
+      'filter table  sub';
+  }
+
+  .one-screen-grid > .area-filter {
+    grid-area: filter;
+    min-height: 0;
+  }
+  .one-screen-grid > .area-chart {
+    grid-area: chart;
+    min-height: 0;
+    min-width: 0;
+  }
+  .one-screen-grid > .area-table {
+    grid-area: table;
+    min-height: 0;
+    min-width: 0;
+  }
+  .one-screen-grid > .area-sim {
+    grid-area: sim;
+    min-height: 0;
+  }
+  .one-screen-grid > .area-sub {
+    grid-area: sub;
+    min-height: 0;
+  }
+
+  /* 1480 ↓ — 우측 컬럼을 좁힘 */
+  @media (max-width: 1480px) {
+    .one-screen-grid {
+      grid-template-columns: 248px minmax(0, 1fr) 320px;
+    }
+  }
+
+  /* 1180 ↓ — 우측 카드 2개를 가로 1행으로 펼치고 한 페이지 스크롤 허용 */
+  @media (max-width: 1180px) {
+    html,
+    body {
+      overflow: auto;
+    }
+    .one-screen-grid {
+      height: auto;
+      grid-template-columns: 220px minmax(0, 1fr);
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        'filter chart'
+        'filter table'
+        'sim    sub';
+    }
+  }
+
+  @media (max-width: 768px) {
+    .one-screen-grid {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'filter'
+        'chart'
+        'table'
+        'sim'
+        'sub';
+    }
+  }
+}

@@ -4,10 +4,13 @@
 
 ## 1. 환경 구분
 
-| 환경 | 용도 | 인프라 |
-|------|------|--------|
-| **Local (시연)** | 해커톤 시연, 개발 | localhost, Docker Compose |
-| **Production (설계)** | 프로덕션 배포 | AWS 완전 관리형 |
+| 환경 | 용도 | 인프라 | Region |
+|------|------|--------|--------|
+| **Local (시연)** | 해커톤 시연, 개발 | localhost, Docker Compose | - |
+| **Production (설계)** | 프로덕션 배포 | AWS 완전 관리형 | us-east-1 |
+
+> **Region 결정**: 워크샵 환경(`us-east-1`)에 맞춰 모든 AWS 서비스를 `us-east-1`에 배포.
+> 한국 사용자 대상 프로덕션 환경에서는 `ap-northeast-2`(서울)로 마이그레이션 권장.
 
 ---
 
@@ -110,7 +113,8 @@ services:
 | 그래프 DB | Neptune | db.r5.large | Gremlin endpoint |
 | 캐시 | ElastiCache Redis | cache.r6g.large | 클러스터 모드 |
 | 객체 저장소 | S3 | Standard | 버전 관리 활성화 |
-| AI/LLM | Bedrock Claude 3.5 Sonnet | On-demand | 한국어 최적 |
+| AI/LLM | Bedrock Claude Sonnet 4.5 | On-demand | us-east-1, 한국어 우수 |
+| AI/LLM (Fast) | Bedrock Claude 3.5 Haiku | On-demand | 빠른 응답용
 | RAG | Bedrock Knowledge Bases | S3 소스 | 자동 동기화 |
 | AI 안전 | Bedrock Guardrails | 커스텀 정책 | 환각 통제 |
 | 크롤러 | Lambda | Python 3.11, 512MB | EventBridge 트리거 |
@@ -163,12 +167,16 @@ Data Subnets (2 AZ):
   "Effect": "Allow",
   "Action": [
     "bedrock:InvokeModel",
+    "bedrock:InvokeModelWithResponseStream",
     "bedrock:Retrieve",
+    "bedrock:RetrieveAndGenerate",
     "bedrock:ApplyGuardrail"
   ],
   "Resource": [
-    "arn:aws:bedrock:*:*:model/anthropic.claude-3-5-sonnet*",
-    "arn:aws:bedrock:*:*:knowledge-base/*"
+    "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-5-*",
+    "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-3-5-haiku-*",
+    "arn:aws:bedrock:us-east-1:*:knowledge-base/*",
+    "arn:aws:bedrock:us-east-1:*:guardrail/*"
   ]
 }
 ```

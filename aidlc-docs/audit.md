@@ -220,3 +220,85 @@
 **Context**: CONSTRUCTION - Infrastructure Design complete. No questions needed (AWS services already decided).
 
 ---
+
+## Infrastructure Design - Approval & Unit 4 Selection
+**Timestamp**: 2026-05-20T09:26:00Z
+**User Input**: "현재 프로젝트 구조는 AI-DLC 방법론을 활용해서 계획되어 있습니다.Construction 단계의 인프라 설계가지 완료가 된 상태입니다.현재까지 설계된 사항을 분석해 주세요그리고 저는 현재 프로젝트에서 Backend에서 Unit 4의 역할을 담당하고 있습니다.Unit4의 역할과 구현해야할 컴포넌트를 분석해 주세요."
+**AI Response**: "Analyzed all design artifacts (requirements, components, services, methods, dependencies, business logic, NFR, infrastructure). Summarized Unit 4 (Integration) responsibilities: NewsCrawler (EXT-04), S3 Client (DL-04), Cross-cutting (CircuitBreaker/CacheManager/Fallback), Demo Data + Seeding, Integration Tests, Deployment Artifacts."
+**Context**: CONSTRUCTION - Infrastructure Design implicitly approved; user selected Unit 4 as their assignment.
+
+---
+
+## Code Generation - Part 1 Planning Started (Unit 4)
+**Timestamp**: 2026-05-20T09:27:00Z
+**User Input**: "네, 다음 단계를 진행해주세요."
+**AI Response**: "Proceeding to CONSTRUCTION - Code Generation Part 1 (Planning) for Unit 4 (Integration). Reading workspace state, story map, and unit dependencies."
+**Context**: CONSTRUCTION - Code Generation Part 1 (Planning) start. Unit: Unit 4 (Integration).
+
+---
+
+## Code Generation - Part 1 Plan Created (Unit 4)
+**Timestamp**: 2026-05-20T09:28:00Z
+**AI Response**: "Created Unit 4 code generation plan at aidlc-docs/construction/plans/unit-4-integration-code-generation-plan.md. 23 numbered steps across 8 phases (Setup, Cross-cutting, Schemas, Adapters, Demo Data, Integration Tests, Deployment, Documentation). Includes traceability matrix (Step ↔ Story ↔ NFR ↔ Acceptance), Extension compliance (Security Baseline + PBT), risk mitigations. Awaiting user approval before Part 2 (Generation)."
+**Context**: CONSTRUCTION - Code Generation Part 1 (Planning) complete for Unit 4. Awaiting explicit approval for Part 2.
+
+---
+
+## Code Generation - Part 1 Approval Request
+**Timestamp**: 2026-05-20T09:29:00Z
+**AI Response**: "Presented plan summary to user with 2-option workflow message (Request Changes / Continue to Part 2). Awaiting response."
+**Context**: CONSTRUCTION - Code Generation Part 1. Awaiting user approval.
+
+---
+
+## Code Generation - Part 2 Complete (Unit 4)
+**Timestamp**: 2026-05-20T10:15:00Z
+**User Input**: "제한 시간이 거의 다 되어갑니다. 웹서비스의 중간 점검을 위해 이제 unit04에 push하고, main 브랜치로 pull request를 해야합니다. 속도를 더 내어 다음 단계로 진행해주세요."
+**AI Response**: "All 23 steps completed. 97 unit tests pass. Proceeding to git commit/push/PR on unit04 branch."
+**Context**: CONSTRUCTION - Code Generation Part 2 complete for Unit 4. Naver API credentials recorded (stored in .env only, not committed).
+
+### Generated Files Summary (Unit 4)
+- **Core (6)**: config.py, logging.py, middleware.py, cache_manager.py, circuit_breaker.py, fallback.py
+- **Adapters (2)**: crawler.py (EXT-04), s3_client.py (DL-04)
+- **Schemas (1)**: news.py (NewsArticle + PBT)
+- **Scripts (3)**: seed_demo_data.py, load_ontology.py, verify_setup.py
+- **Data (5)**: food_nodes.json (45 nodes), food_edges.json (30 edges), 3x news samples
+- **Deployment (3)**: docker-compose.yml, .env.example, .gitignore
+- **Tests (8 files, 97 tests)**: unit tests + PBT (Hypothesis)
+- **Docs**: backend/README.md, 9x step summaries
+
+### Test Results: 97/97 PASSED
+
+---
+
+## Infrastructure Design - Approval (Unit 1 perspective)
+**Timestamp**: 2026-05-20T13:30:00Z
+**User Input**: "네 다음 단계를 진행해 주세요"
+**AI Response**: "Infrastructure Design approved. Proceeding to Code Generation."
+**Context**: CONSTRUCTION - Infrastructure Design approved. Moving to Code Generation (per-unit).
+
+---
+
+## Code Generation - Unit 1 (Frontend) - Plan & Step 1 Skeleton
+**Timestamp**: 2026-05-20T13:31:00Z
+**User Input**: "내가 제공한 아래 요구사항 를 바탕으로 Next.js 14 환경에서 작동하는 고퀄리티 단일 화면 대시보드(Single Page Dashboard) 코드를 작성해줘. (프론트는 리액트 기반으로 고퀄이면 좋겠어)(너는 지금 6시간 안에 완벽한 프로토타입을 만들어야 하는 AWS 해커톤의 수석 프론트엔드 개발자입니다. ) ... [추가 요구사항: Unit of Work 기반 개발] ... Step-by-Step Implementation: 한 번의 답변으로 모든 상세 코드를 완성하려 하지 마세요. 첫 번째 답변에서는 전체 폴더 구조, 타입 정의(Interface), 그리고 Bento-box 레이아웃의 최상위 껍데기(Layout Skeleton)만 제시해 주세요."
+**AI Response**: "Created Code Generation plan for Unit 1 (Frontend) at aidlc-docs/construction/plans/code-generation-plan.md. Executing Step 1: bootstrap Next.js 14 + TypeScript scaffolding, Strict TypeScript interfaces (API contract), async mock API layer with loading states, Zustand store, and Bento-box DashboardLayout skeleton. Subsequent components (PriceChart, ChatBot, etc.) will be implemented in follow-up iterations per user's step-by-step directive."
+**Context**: CONSTRUCTION - Code Generation Part 1 (Planning) + Part 2 Step 1 (Skeleton). Scope strictly limited to Unit 1 per unit-of-work.md.
+
+---
+
+## Code Generation - Unit 1 (Frontend) - Step 1 Foundation Complete
+**Timestamp**: 2026-05-20T13:55:00Z
+**User Input**: "진행해줘 계속" / "계속 진행해줘."
+**AI Response**: "Step 1 (Foundation) of frontend Unit 1 completed and verified. Created Next.js 14 + TypeScript + Tailwind + Zustand + Recharts scaffolding under frontend/. Generated: types/index.ts (API contract — 30+ interfaces for Categories, Ingredients, PriceSeries, SpikeEvent, NewsItem, Recipe, CostSimulationResult, Substitute, ChatMessage, ChatStreamChunk, ApiResponse/Error wrappers); lib/mockData.ts (4 categories, 15 ingredients, 15 price series with synthetic spikes, 4 recipes, 3 substitute groups, news pool); lib/mockApi.ts (async wrappers with simulated latency, ApiResponse wrapping, optional failure simulation); lib/store.ts (Zustand store with selection + chat slices, devtools, selectors); lib/utils.ts (cn, formatKRW, formatRate, isOk type guard); components/ui/{BentoCard,SectionHeader,SkeletonCard}; components/dashboard/{DashboardLayout (Bento-box layout with TopBar + 5 grid slots + floating chat), CategoryFilter, PriceChart, PriceTable, CostSimulator, SubstituteRecommender, ChatBot} (all FE-01~FE-07 placeholders with TODO comments mapped to subsequent steps). Verified: npm install (462 pkgs), tsc --noEmit (clean), next lint (clean), next build (compiled successfully, / route 14.9kB / First Load JS 102kB)."
+**Context**: CONSTRUCTION - Code Generation. Step 1 complete. Subsequent steps (PriceChart Recharts impl, CategoryFilter live, CostSimulator, SubstituteRecommender, ChatBot streaming) await user's follow-up tail questions per step-by-step directive.
+
+---
+
+## Code Generation - Unit 1 (Frontend) - Steps 2~4 Complete (Live Components)
+**Timestamp**: 2026-05-20T14:25:00Z
+**User Input**: "계속 진행해줘 대략적으로 화면 확인하고 수정 후 내 branch로 push할거야 프론트엔드는 나중에 admin이 다른 협업분들과 합칠거라서 프론트엔드 결과도 봐야해 내가 프론트 담당이라"
+**AI Response**: "Implemented Steps 2~4 in one pass. Step 2: lib/hooks.ts (useAsync, useDebouncedValue), CategoryFilter live (tabs + debounced search + ingredient list + Zustand sync), PriceChart live (Recharts LineChart with wholesale/retail lines, ReferenceDot for spikes, KPI mini-cards), PriceChartTooltip (CustomTooltip with date/price/changeRate + Spike branch showing summary + keyword chips + max 3 news headlines), PriceTable live (recent 7 days, focusedDate two-way sync with chart cursor, spike row accent). Step 3: CostSimulator live (servings +/- control, recipe card grid with active highlight, breakdown table per active recipe, AI rationale panel, 'AI similar recipe' button opens chat), SubstituteRecommender live (auto-pick highest unit-price ingredient from active recipe, savings display, similarity/quality bars, 'view price' / 'chat' actions). Step 4: lib/chatStream.ts (streamMockChat AsyncGenerator emitting ChatStreamChunk tokens/inline_tags/citations/done with question pattern matching for onion/kimchi-jjigae/substitute/ingredient/recipe), store extended with appendChatCitation, ChatBot live (framer-motion floating button + slide-up panel, streaming with typing cursor, suggested prompts, inline tag chips clickable to update Zustand selection, citation footnotes). Verified: tsc --noEmit clean, next lint clean, next build successful (/ 162kB / First Load JS 249kB), dev server on :3001 returned HTTP 200 in 2.3s. Dashboard fully interactive: category tab → ingredient list → chart/table updates in sync; spike hover shows news; recipe selection drives breakdown + substitute recommendations; chatbot streaming with clickable inline tags."
+**Context**: CONSTRUCTION - Code Generation Steps 2~4 complete. All FE-01~FE-07 components live. Step 5 (polish: motion micro-interactions, a11y, demo scenario richness) remains optional.
+
+---
