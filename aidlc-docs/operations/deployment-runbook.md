@@ -1,114 +1,100 @@
-# Deployment Runbook — FoodLens (식견)
+# Deployment Runbook - 식견(FoodLens)
 
-## 시연 환경 배포 (Local Demo)
+## 시연 환경 배포 (localhost)
 
 ### Pre-Deployment Checklist
 - [x] Docker Desktop 실행 중
-- [x] `.env` 파일 생성 (USE_MOCK=true)
-- [x] 포트 5432, 6379, 3000, 8000 사용 가능
-- [x] Node.js 18+, Python 3.11+ 설치
+- [x] AWS 자격증명 설정 (.env)
+- [x] 네이버 API 키 설정 (.env)
+- [x] PostgreSQL + Redis 컨테이너 실행 중
+- [x] Backend 의존성 설치 완료
+- [x] Frontend 의존성 설치 완료
 
 ### Deployment Steps
 
-#### Step 1: 인프라 시작
+#### 1. 인프라 시작
 ```bash
 cd AI-DLC
 docker-compose up -d
-
-# 확인
-docker ps
-# foodlens-postgres (5432) ✅
-# foodlens-redis (6379) ✅
+# 확인: docker-compose ps → postgres(5432), redis(6379) Running
 ```
 
-#### Step 2: 백엔드 시작
+#### 2. 백엔드 시작
 ```bash
 cd backend
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-pip install -r requirements.txt
+.venv\Scripts\activate
 uvicorn app.main:app --reload --port 8000
+# 확인: http://localhost:8000/health → {"status": "healthy"}
+# API 문서: http://localhost:8000/docs
 ```
 
-#### Step 3: 프론트엔드 시작
+#### 3. 프론트엔드 시작
 ```bash
 cd frontend
-npm install
 npm run dev
+# 확인: http://localhost:3000 → 대시보드 표시
 ```
 
-#### Step 4: 검증
-- http://localhost:8000/docs → Swagger UI ✅
-- http://localhost:3000 → 대시보드 ✅
+#### 4. 시연 데이터 적재 (선택)
+```bash
+cd backend
+python scripts/seed_demo_data.py
+python scripts/load_ontology.py
+```
 
 ---
 
-## 프로덕션 배포 (AWS - 설계)
+## 프로덕션 배포 (AWS - 설계 문서)
 
-### Pre-Deployment Checklist
-- [ ] AWS 계정 + IAM 역할 준비
-- [ ] VPC + 서브넷 프로비저닝
-- [ ] RDS PostgreSQL 15 Multi-AZ 생성
-- [ ] Neptune 클러스터 생성
-- [ ] Bedrock Knowledge Base 구성
-- [ ] S3 버킷 생성 + RAG 문서 업로드
-- [ ] ECR 리포지토리 생성
-- [ ] Secrets Manager에 API 키 등록
-- [ ] CloudFront + ACM 인증서
+### Infrastructure Provisioning
+```bash
+# CDK 또는 Terraform으로 프로비저닝
+# VPC, ECS Cluster, RDS, Neptune, ElastiCache, S3, Bedrock KB
+```
 
 ### Deployment Order (의존성 순서)
+1. **Infrastructure**: VPC, Subnets, Security Groups
+2. **Data Layer**: RDS PostgreSQL, Neptune, ElastiCache, S3
+3. **AI Layer**: Bedrock Knowledge Base 구성, Guardrails 설정
+4. **Backend**: ECS Fargate (FastAPI) 배포
+5. **Frontend**: ECS Fargate (Next.js) 또는 S3+CloudFront 배포
+6. **Lambda**: SAM deploy (크롤러, 메뉴 생성, Neptune 로더)
+7. **DNS/CDN**: Route 53 + CloudFront 설정
+
+### Post-Deployment Validation
+- [ ] Health check 엔드포인트 응답 확인
+- [ ] 시세 API 정상 응답 확인
+- [ ] 챗봇 WebSocket 연결 확인
+- [ ] 크롤링 Lambda 트리거 확인
+- [ ] CloudWatch 로그 수집 확인
+
+---
+
+## Rollback Procedures
+
+### 시연 환경
+```bash
+# 서버 중지
+Ctrl+C (uvicorn, npm)
+
+# Docker 중지
+docker-compose down
+
+# 이전 커밋으로 복원
+git checkout <previous-commit>
 ```
-1. VPC + Networking
-2. RDS + Neptune + ElastiCache
-3. S3 + Bedrock KB
-4. ECS Cluster + Task Definitions
-5. ALB + Target Groups
-6. ECS Services (Backend → Frontend)
-7. CloudFront Distribution
-8. Route 53 DNS
-9. CloudWatch Alarms
+
+### 프로덕션 (설계)
+```bash
+# ECS 롤백
+aws ecs update-service --cluster foodlens --service backend --task-definition foodlens-backend:<previous-revision>
+
+# DB 롤백 (필요 시)
+alembic downgrade -1
 ```
 
 ### Rollback Triggers
-- Error rate > 5% for 5 minutes
-- Latency p95 > 5000ms for 5 minutes
-- Health check failures > 3 consecutive
-- 500 에러 급증
-
-### Rollback Steps
-```bash
-# ECS 서비스 이전 태스크 정의로 롤백
-aws ecs update-service --cluster foodlens \
-  --service backend --task-definition foodlens-backend:PREVIOUS_VERSION
-
-# DB 마이그레이션 롤백 (필요 시)
-cd backend && alembic downgrade -1
-```
-
----
-
-## 시연 시나리오 스크립트
-
-### 시나리오 1: 시세 대시보드 (2분)
-1. 대시보드 접속 → Bento-box 레이아웃 소개
-2. 카테고리 탭 전환 (농산물 → 수산물 → 축산물)
-3. 품목 선택 → 도매/소매/Gap 테이블 확인
-4. 시세 추이 차트 → Spike 포인트 마우스 오버 → 뉴스 헤드라인 표시
-
-### 시나리오 2: AI 챗봇 (2분)
-1. 챗봇 플로팅 버튼 클릭 → 채팅창 열림
-2. "고등어 현재 시세는?" → 컨설턴트 스타일 응답 (출처 포함)
-3. "상추 대신 쓸 수 있는 식재료 추천해줘" → 대체 식자재 + 레시피 추천
-4. "1000식 기준 이번 주 점심 메뉴 추천" → 예산 내 메뉴 조합
-
-### 시나리오 3: 원가 시뮬레이션 (1분)
-1. CostSimulator에서 식수 1000 입력
-2. 예산 4,500,000원 설정
-3. 시뮬레이션 실행 → 레시피별 원가 비교
-4. 대체 식자재 적용 시 절감률 확인
-
-### 시나리오 4: 기술 아키텍처 설명 (1분)
-1. AWS 아키텍처 다이어그램 표시
-2. Bedrock + RAG + Neptune 온톨로지 설명
-3. Circuit Breaker + Fallback 패턴 설명
-4. PBT 테스트 결과 (97개 통과) 시연
+- API 에러율 > 5% (5분 지속)
+- 응답 시간 p95 > 5초 (5분 지속)
+- Health check 3회 연속 실패
+- 챗봇 WebSocket 연결 실패율 > 10%
