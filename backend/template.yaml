@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: FoodLens - Daily Menu Generation Lambda (Unit 3)
+
+Globals:
+  Function:
+    Timeout: 120
+    Runtime: python3.11
+    MemorySize: 512
+
+Parameters:
+  DbHost:
+    Type: String
+    Description: PostgreSQL host
+  DbPort:
+    Type: String
+    Default: '5432'
+  DbName:
+    Type: String
+    Default: ai-dlc
+  DbUser:
+    Type: String
+  DbPassword:
+    Type: String
+    NoEcho: true
+  BedrockModelId:
+    Type: String
+    Default: anthropic.claude-3-5-sonnet-20241022-v2:0
+
+Resources:
+  MenuGenerationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: foodlens-menu-generation
+      Handler: lambda_handler.handler
+      CodeUri: .
+      Description: 매일 농수산물 시세 기반 AI 메뉴 추천 생성
+      Environment:
+        Variables:
+          DB_HOST: !Ref DbHost
+          DB_PORT: !Ref DbPort
+          DB_NAME: !Ref DbName
+          DB_USER: !Ref DbUser
+          DB_PASSWORD: !Ref DbPassword
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          TARGET_SERVINGS: '100'
+          BUDGET_PER_SERVING: '4500'
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}'
+      Events:
+        DailySchedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 6 * * ? *)
+            Description: 매일 오전 6시(UTC) 메뉴 생성
+            Enabled: true
+
+Outputs:
+  MenuGenerationFunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt MenuGenerationFunction.Arn
+  MenuGenerationFunctionName:
+    Description: Lambda Function Name
+    Value: !Ref MenuGenerationFunction
