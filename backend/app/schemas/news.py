@@ -45,3 +45,55 @@ class TrendKeyword(BaseModel):
     ratio: float = Field(description="검색 비율 (0~100)")
     period: str
     category: str | None = None
+
+
+# --- Unit 4 Crawler 호환 스키마 ---
+
+from enum import Enum
+from typing import Optional
+
+
+class NewsSourceEnum(str, Enum):
+    """뉴스 출처 열거형"""
+    NAVER = "naver"
+    MAFRA = "mafra"
+    MOF = "mof"
+
+
+class NewsArticleCreate(BaseModel):
+    """뉴스 기사 생성 스키마 (크롤러 → DB 적재용)"""
+    title: str = Field(max_length=500)
+    url: str = Field(max_length=2000)
+    source: NewsSourceEnum
+    published_at: datetime
+    keywords: list[str] = Field(default_factory=list)
+    related_items: list[str] = Field(default_factory=list)
+    summary: Optional[str] = None
+
+
+class NewsArticle(BaseModel):
+    """뉴스 기사 (DB 모델 호환)"""
+    id: Optional[UUID] = None
+    title: str = Field(max_length=500)
+    url: str = Field(max_length=2000)
+    source: NewsSourceEnum
+    published_at: datetime
+    keywords: list[str] = Field(default_factory=list)
+    related_items: list[str] = Field(default_factory=list)
+    summary: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+# --- Unit 4 Test 호환 alias/함수 ---
+
+import re as _re
+
+
+def strip_html(text: str) -> str:
+    """HTML 태그 제거 유틸리티 (XSS 방지)"""
+    return _re.sub(r'<[^>]+>', '', text).strip()
+
+
+# Alias for backward compatibility with Unit 4 tests
+NewsSearchQuery = NewsSearchParams
