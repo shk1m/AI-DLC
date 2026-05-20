@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: FoodLens - News RAG Ingestion Lambda with S3 Vectors (Unit 3)
+
+Globals:
+  Function:
+    Timeout: 60
+    Runtime: python3.11
+    MemorySize: 512
+
+Parameters:
+  EmbeddingModelId:
+    Type: String
+    Default: amazon.titan-embed-text-v2:0
+  VectorBucketName:
+    Type: String
+    Default: ai-dlc-rag-vectors
+  VectorIndexName:
+    Type: String
+    Default: news-embeddings
+  NewsBucketName:
+    Type: String
+    Default: ai-dlc-news-articles
+
+Resources:
+  RagIngestionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: foodlens-rag-ingestion
+      Handler: lambda_handler.handler
+      CodeUri: .
+      Description: S3 뉴스 기사 업로드 시 Bedrock 임베딩 후 S3 Vectors 적재
+      Environment:
+        Variables:
+          VECTOR_BUCKET_NAME: !Ref VectorBucketName
+          VECTOR_INDEX_NAME: !Ref VectorIndexName
+          EMBEDDING_MODEL_ID: !Ref EmbeddingModelId
+          EMBEDDING_DIMENSION: '1024'
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource:
+                - !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/${EmbeddingModelId}'
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource:
+                - !Sub 'arn:aws:s3:::${NewsBucketName}/*'
+            - Effect: Allow
+              Action:
+                - s3vectors:PutVectors
+                - s3vectors:QueryVectors
+                - s3vectors:GetVectors
+                - s3vectors:DeleteVectors
+              Resource:
+                - !Sub 'arn:aws:s3vectors:${AWS::Region}:${AWS::AccountId}:bucket/${VectorBucketName}/index/${VectorIndexName}'
+      Events:
+        S3NewsUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref NewsBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .json
+
+  NewsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref NewsBucketName
+
+Outputs:
+  RagIngestionFunctionArn:
+    Description: RAG Ingestion Lambda ARN
+    Value: !GetAtt RagIngestionFunction.Arn
+  NewsBucketArn:
+    Description: News Articles S3 Bucket ARN
+    Value: !GetAtt NewsBucket.Arn
