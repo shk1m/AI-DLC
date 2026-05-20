@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #__next {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-ink-50 text-ink-900 antialiased;
+    font-feature-settings:
+      'ss01' on,
+      'cv11' on;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(36, 157, 98, 0.08), transparent 35%),
+      radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.06), transparent 40%),
+      radial-gradient(circle at 100% 100%, rgba(239, 68, 68, 0.05), transparent 35%);
+    background-attachment: fixed;
+  }
+
+  /* Recharts default tooltip 제거 — 우리 CustomTooltip 사용 */
+  .recharts-tooltip-wrapper {
+    outline: none;
+  }
+}
+
+@layer components {
+  .bento-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: minmax(120px, auto);
+  }
+
+  .bento-grid > .col-sidebar {
+    grid-column: span 3 / span 3;
+  }
+  .bento-grid > .col-main {
+    grid-column: span 6 / span 6;
+  }
+  .bento-grid > .col-aside {
+    grid-column: span 3 / span 3;
+  }
+
+  @media (max-width: 1280px) {
+    .bento-grid > .col-sidebar {
+      grid-column: span 4 / span 4;
+    }
+    .bento-grid > .col-main {
+      grid-column: span 8 / span 8;
+    }
+    .bento-grid > .col-aside {
+      grid-column: span 12 / span 12;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .bento-grid > .col-sidebar,
+    .bento-grid > .col-main,
+    .bento-grid > .col-aside {
+      grid-column: span 12 / span 12;
+    }
+  }
+}

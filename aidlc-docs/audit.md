@@ -220,3 +220,35 @@
 **Context**: CONSTRUCTION - Infrastructure Design complete. No questions needed (AWS services already decided).
 
 ---
+
+## Infrastructure Design - Approval
+**Timestamp**: 2026-05-20T13:30:00Z
+**User Input**: "네 다음 단계를 진행해 주세요"
+**AI Response**: "Infrastructure Design approved. Proceeding to Code Generation."
+**Context**: CONSTRUCTION - Infrastructure Design approved. Moving to Code Generation (per-unit).
+
+---
+
+## Code Generation - Unit 1 (Frontend) - Plan & Step 1 Skeleton
+**Timestamp**: 2026-05-20T13:31:00Z
+**User Input**: "내가 제공한 아래 요구사항 를 바탕으로 Next.js 14 환경에서 작동하는 고퀄리티 단일 화면 대시보드(Single Page Dashboard) 코드를 작성해줘. (프론트는 리액트 기반으로 고퀄이면 좋겠어)(너는 지금 6시간 안에 완벽한 프로토타입을 만들어야 하는 AWS 해커톤의 수석 프론트엔드 개발자입니다. ) ... [추가 요구사항: Unit of Work 기반 개발] ... Step-by-Step Implementation: 한 번의 답변으로 모든 상세 코드를 완성하려 하지 마세요. 첫 번째 답변에서는 전체 폴더 구조, 타입 정의(Interface), 그리고 Bento-box 레이아웃의 최상위 껍데기(Layout Skeleton)만 제시해 주세요."
+**AI Response**: "Created Code Generation plan for Unit 1 (Frontend) at aidlc-docs/construction/plans/code-generation-plan.md. Executing Step 1: bootstrap Next.js 14 + TypeScript scaffolding, Strict TypeScript interfaces (API contract), async mock API layer with loading states, Zustand store, and Bento-box DashboardLayout skeleton. Subsequent components (PriceChart, ChatBot, etc.) will be implemented in follow-up iterations per user's step-by-step directive."
+**Context**: CONSTRUCTION - Code Generation Part 1 (Planning) + Part 2 Step 1 (Skeleton). Scope strictly limited to Unit 1 per unit-of-work.md.
+
+---
+
+## Code Generation - Unit 1 (Frontend) - Step 1 Foundation Complete
+**Timestamp**: 2026-05-20T13:55:00Z
+**User Input**: "진행해줘 계속" / "계속 진행해줘."
+**AI Response**: "Step 1 (Foundation) of frontend Unit 1 completed and verified. Created Next.js 14 + TypeScript + Tailwind + Zustand + Recharts scaffolding under frontend/. Generated: types/index.ts (API contract — 30+ interfaces for Categories, Ingredients, PriceSeries, SpikeEvent, NewsItem, Recipe, CostSimulationResult, Substitute, ChatMessage, ChatStreamChunk, ApiResponse/Error wrappers); lib/mockData.ts (4 categories, 15 ingredients, 15 price series with synthetic spikes, 4 recipes, 3 substitute groups, news pool); lib/mockApi.ts (async wrappers with simulated latency, ApiResponse wrapping, optional failure simulation); lib/store.ts (Zustand store with selection + chat slices, devtools, selectors); lib/utils.ts (cn, formatKRW, formatRate, isOk type guard); components/ui/{BentoCard,SectionHeader,SkeletonCard}; components/dashboard/{DashboardLayout (Bento-box layout with TopBar + 5 grid slots + floating chat), CategoryFilter, PriceChart, PriceTable, CostSimulator, SubstituteRecommender, ChatBot} (all FE-01~FE-07 placeholders with TODO comments mapped to subsequent steps). Verified: npm install (462 pkgs), tsc --noEmit (clean), next lint (clean), next build (compiled successfully, / route 14.9kB / First Load JS 102kB)."
+**Context**: CONSTRUCTION - Code Generation. Step 1 complete. Subsequent steps (PriceChart Recharts impl, CategoryFilter live, CostSimulator, SubstituteRecommender, ChatBot streaming) await user's follow-up tail questions per step-by-step directive.
+
+---
+
+## Code Generation - Unit 1 (Frontend) - Steps 2~4 Complete (Live Components)
+**Timestamp**: 2026-05-20T14:25:00Z
+**User Input**: "계속 진행해줘 대략적으로 화면 확인하고 수정 후 내 branch로 push할거야 프론트엔드는 나중에 admin이 다른 협업분들과 합칠거라서 프론트엔드 결과도 봐야해 내가 프론트 담당이라"
+**AI Response**: "Implemented Steps 2~4 in one pass. Step 2: lib/hooks.ts (useAsync, useDebouncedValue), CategoryFilter live (tabs + debounced search + ingredient list + Zustand sync), PriceChart live (Recharts LineChart with wholesale/retail lines, ReferenceDot for spikes, KPI mini-cards), PriceChartTooltip (CustomTooltip with date/price/changeRate + Spike branch showing summary + keyword chips + max 3 news headlines), PriceTable live (recent 7 days, focusedDate two-way sync with chart cursor, spike row accent). Step 3: CostSimulator live (servings +/- control, recipe card grid with active highlight, breakdown table per active recipe, AI rationale panel, 'AI similar recipe' button opens chat), SubstituteRecommender live (auto-pick highest unit-price ingredient from active recipe, savings display, similarity/quality bars, 'view price' / 'chat' actions). Step 4: lib/chatStream.ts (streamMockChat AsyncGenerator emitting ChatStreamChunk tokens/inline_tags/citations/done with question pattern matching for onion/kimchi-jjigae/substitute/ingredient/recipe), store extended with appendChatCitation, ChatBot live (framer-motion floating button + slide-up panel, streaming with typing cursor, suggested prompts, inline tag chips clickable to update Zustand selection, citation footnotes). Verified: tsc --noEmit clean, next lint clean, next build successful (/ 162kB / First Load JS 249kB), dev server on :3001 returned HTTP 200 in 2.3s. Dashboard fully interactive: category tab → ingredient list → chart/table updates in sync; spike hover shows news; recipe selection drives breakdown + substitute recommendations; chatbot streaming with clickable inline tags."
+**Context**: CONSTRUCTION - Code Generation Steps 2~4 complete. All FE-01~FE-07 components live. Step 5 (polish: motion micro-interactions, a11y, demo scenario richness) remains optional.
+
+---
