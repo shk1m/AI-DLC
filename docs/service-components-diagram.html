@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FoodLens - Service Components</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { background: white; margin: 20px; font-family: sans-serif; }
+        h1 { text-align: center; color: #1F2937; }
+        .mermaid { display: flex; justify-content: center; }
+        .instructions { text-align: center; color: #6B7280; font-size: 14px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🍽️ 식견(FoodLens) - Service Component Map</h1>
+    <div class="mermaid">
+flowchart LR
+    subgraph FE["🖥️ Frontend - Unit 1 (팀원 A)"]
+        direction TB
+        FE01["FE-01 DashboardLayout\n(Bento-box Grid)"]
+        FE02["FE-02 PriceChart\n(Recharts + CustomTooltip)"]
+        FE03["FE-03 CategoryFilter\n(탭 전환 + 검색)"]
+        FE04["FE-04 PriceTable\n(도매/소매/Gap)"]
+        FE05["FE-05 CostSimulator\n(식수별 원가 계산)"]
+        FE06["FE-06 ChatBot\n(WebSocket + 타이핑)"]
+        FE07["FE-07 SubstituteRecommender\n(대체 식자재 표시)"]
+    end
+
+    subgraph BE["⚙️ Backend API - Unit 2 (팀원 B)"]
+        direction TB
+        BE01["BE-01 PriceService\n시세 조회 + Spike 감지\n(Z-Score 알고리즘)"]
+        BE03["BE-03 RecipeService\n레시피 추천 + 원가 계산"]
+        BE05["BE-05 NewsService\n뉴스 검색 + 시세 매핑"]
+        MODELS["Models\nFoodItem | PriceRecord\nSpikeEvent | Recipe\nNewsArticle | Chat"]
+        ADAPT["Adapters\nKAMIS | PublicData | Naver"]
+    end
+
+    subgraph AI["🤖 AI/Data - Unit 3 (팀원 C)"]
+        direction TB
+        BE02["BE-02 ChatService\nLangChain Agent 실행"]
+        BE07["BE-07 LangChainAgent\n도구 자동 선택"]
+        BEDROCK["BedrockClient\nClaude 3.5 Sonnet"]
+        MENUGEN["MenuGenerationService\nAI 메뉴 생성 (Lambda)"]
+        ONTOLOGY["OntologyService\nNeptune 그래프 쿼리"]
+    end
+
+    subgraph INT["🔧 Integration - Unit 4 (팀원 D)"]
+        direction TB
+        CRAWLER["NewsCrawler (EXT-04)\n정부 보도자료 수집"]
+        S3CLI["S3 Client (DL-04)\n문서 저장/조회"]
+        CB["CircuitBreaker\nCLOSED→OPEN→HALF_OPEN"]
+        CACHE["CacheManager\nTTL: 시세1h/뉴스30m/온톨로지24h"]
+        FB["Fallback\n캐시 자동 전환"]
+        TESTS["97 Unit Tests\n(Hypothesis PBT 포함)"]
+        DATA["Demo Data\n45 식자재 노드\n30 관계 엣지\n뉴스 샘플"]
+    end
+
+    subgraph DB["💾 Data Stores"]
+        direction TB
+        RDS["PostgreSQL 15\n(시세/뉴스/마스터)"]
+        NEPTUNE["Neptune\n(온톨로지 그래프)"]
+        BEDROCKDB["Bedrock KB\n(RAG 벡터 검색)"]
+        S3STORE["S3 Bucket\n(RAG 소스 문서)"]
+    end
+
+    FE02 -->|"GET /api/prices/{id}/history"| BE01
+    FE04 -->|"GET /api/prices/{category}"| BE01
+    FE05 -->|"POST /api/recipes/simulate"| BE03
+    FE06 -->|"WS /ws/chat/{session}"| BE02
+    FE07 -->|"GET /api/substitutes/{id}"| ONTOLOGY
+
+    BE01 --> CB
+    CB --> ADAPT
+    BE05 --> CRAWLER
+    BE02 --> BE07
+    BE07 -->|"price_lookup"| BE01
+    BE07 -->|"suggest_recipe"| BE03
+    BE07 -->|"search_news"| BE05
+    BE07 -->|"find_substitute"| ONTOLOGY
+    BE02 --> BEDROCK
+    MENUGEN --> BEDROCK
+
+    BE01 --> RDS
+    BE05 --> RDS
+    ONTOLOGY --> NEPTUNE
+    BEDROCK --> BEDROCKDB
+    S3CLI --> S3STORE
+    CRAWLER --> S3CLI
+    </div>
+    <p class="instructions">💡 이 페이지를 브라우저에서 열고 마우스 우클릭 → "이미지로 저장" 또는 스크린샷으로 PNG/SVG 이미지를 생성할 수 있습니다.</p>
+</body>
+</html>

@@ -1,0 +1,107 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#4F46E5', 'primaryTextColor': '#fff', 'primaryBorderColor': '#3730A3', 'lineColor': '#6366F1', 'secondaryColor': '#F59E0B', 'tertiaryColor': '#10B981'}}}%%
+flowchart TB
+    subgraph CLIENT["👤 Client Layer"]
+        USER["사용자<br/>(영양사 / MD / 바이어)"]
+    end
+
+    subgraph FRONTEND["🖥️ Frontend - Next.js 14"]
+        direction LR
+        DASH["DashboardLayout<br/>(Bento-box)"]
+        CHART["PriceChart<br/>(Recharts + Spike)"]
+        TABLE["PriceTable<br/>(도매/소매/Gap)"]
+        FILTER["CategoryFilter<br/>(탭 + 검색)"]
+        SIM["CostSimulator<br/>(식수별 원가)"]
+        SUB["SubstituteRecommender<br/>(대체 식자재)"]
+        CHAT["ChatBot<br/>(플로팅 + 스트리밍)"]
+    end
+
+    subgraph BACKEND["⚙️ Backend - FastAPI + LangChain"]
+        direction TB
+        subgraph ROUTERS["API Routers"]
+            R_PRICE["/api/prices"]
+            R_RECIPE["/api/recipes"]
+            R_NEWS["/api/news"]
+            R_CHAT["/ws/chat"]
+        end
+        subgraph SERVICES["Business Services"]
+            S_PRICE["PriceService"]
+            S_RECIPE["RecipeService"]
+            S_NEWS["NewsService"]
+            S_BEDROCK["BedrockClient"]
+            S_MENU["MenuGenerationService"]
+        end
+        subgraph CORE["Cross-cutting (NFR)"]
+            CACHE["CacheManager"]
+            CB["CircuitBreaker"]
+            FALLBACK["Fallback"]
+            MW["Middleware<br/>(CorrelationID + Logger)"]
+        end
+        subgraph ADAPTERS["External Adapters"]
+            A_KAMIS["KAMIS API"]
+            A_PUBLIC["공공데이터포털"]
+            A_NAVER["네이버 API"]
+            A_CRAWLER["NewsCrawler"]
+            A_S3["S3 Client"]
+        end
+    end
+
+    subgraph AWS["☁️ AWS Cloud Services"]
+        direction LR
+        BEDROCK["Amazon Bedrock<br/>(Claude 3.5 Sonnet)"]
+        KB["Bedrock<br/>Knowledge Bases"]
+        GUARD["Bedrock<br/>Guardrails"]
+        NEPTUNE["Amazon Neptune<br/>(온톨로지 그래프)"]
+        RDS["Amazon RDS<br/>(PostgreSQL 15)"]
+        S3["Amazon S3<br/>(RAG 문서)"]
+        LAMBDA["AWS Lambda<br/>(비동기 AI 처리)"]
+    end
+
+    subgraph EXTERNAL["🌐 External Data Sources"]
+        direction LR
+        EXT_KAMIS["KAMIS<br/>농산물유통정보"]
+        EXT_PUBLIC["공공데이터포털<br/>(6~7개 API)"]
+        EXT_NAVER["네이버<br/>검색/데이터랩"]
+        EXT_GOV["정부 보도자료<br/>(농식품부/해수부)"]
+    end
+
+    USER --> FRONTEND
+    FRONTEND -->|REST| ROUTERS
+    CHAT -->|WebSocket| R_CHAT
+
+    R_PRICE --> S_PRICE
+    R_RECIPE --> S_RECIPE
+    R_NEWS --> S_NEWS
+    R_CHAT --> S_BEDROCK
+
+    S_PRICE --> CACHE
+    S_PRICE --> CB
+    CB --> A_KAMIS
+    CB --> A_PUBLIC
+    S_NEWS --> A_NAVER
+    S_NEWS --> A_CRAWLER
+    S_BEDROCK --> BEDROCK
+    S_BEDROCK --> KB
+    S_MENU --> LAMBDA
+
+    A_KAMIS --> EXT_KAMIS
+    A_PUBLIC --> EXT_PUBLIC
+    A_NAVER --> EXT_NAVER
+    A_CRAWLER --> EXT_GOV
+
+    S_PRICE --> RDS
+    S_NEWS --> RDS
+    S_RECIPE --> RDS
+    S_BEDROCK --> NEPTUNE
+    KB --> S3
+    A_S3 --> S3
+    BEDROCK --> GUARD
+
+    style CLIENT fill:#EEF2FF,stroke:#4F46E5,stroke-width:2px
+    style FRONTEND fill:#DBEAFE,stroke:#2563EB,stroke-width:2px
+    style BACKEND fill:#D1FAE5,stroke:#059669,stroke-width:2px
+    style AWS fill:#FEF3C7,stroke:#D97706,stroke-width:2px
+    style EXTERNAL fill:#FEE2E2,stroke:#DC2626,stroke-width:2px
+    style ROUTERS fill:#E0E7FF,stroke:#4338CA
+    style SERVICES fill:#ECFDF5,stroke:#047857
+    style CORE fill:#FEF9C3,stroke:#CA8A04
+    style ADAPTERS fill:#F0FDF4,stroke:#15803D

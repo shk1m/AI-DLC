@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FoodLens - System Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { background: white; margin: 20px; font-family: sans-serif; }
+        h1 { text-align: center; color: #1F2937; }
+        .mermaid { display: flex; justify-content: center; }
+        .instructions { text-align: center; color: #6B7280; font-size: 14px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🍽️ 식견(FoodLens) - System Architecture</h1>
+    <div class="mermaid">
+flowchart TB
+    subgraph CLIENT["👤 Client Layer"]
+        USER["사용자 (영양사 / MD / 바이어)"]
+    end
+
+    subgraph FRONTEND["🖥️ Frontend - Next.js 14 + React + TypeScript"]
+        direction LR
+        DASH["DashboardLayout\n(Bento-box)"]
+        CHART["PriceChart\n(Recharts + Spike)"]
+        TABLE["PriceTable\n(도매/소매/Gap)"]
+        FILTER["CategoryFilter\n(탭 + 검색)"]
+        SIM["CostSimulator\n(식수별 원가)"]
+        SUB["SubstituteRecommender\n(대체 식자재)"]
+        CHAT["ChatBot\n(플로팅 + 스트리밍)"]
+    end
+
+    subgraph BACKEND["⚙️ Backend - FastAPI + LangChain"]
+        direction TB
+        subgraph ROUTERS["API Routers"]
+            R_PRICE["/api/prices"]
+            R_RECIPE["/api/recipes"]
+            R_NEWS["/api/news"]
+            R_CHAT["/ws/chat (WebSocket)"]
+        end
+        subgraph SERVICES["Business Services"]
+            S_PRICE["PriceService\n(시세 조회 + Spike 감지)"]
+            S_RECIPE["RecipeService\n(레시피 + 원가 계산)"]
+            S_NEWS["NewsService\n(뉴스 검색 + 크롤링)"]
+            S_BEDROCK["BedrockClient\n(LLM 호출)"]
+            S_MENU["MenuGenerationService\n(AI 메뉴 생성)"]
+        end
+        subgraph CORE["Cross-cutting (NFR Design)"]
+            CACHE["CacheManager\n(TTL 기반)"]
+            CB["CircuitBreaker\n(5회 실패→차단)"]
+            FALLBACK["Fallback\n(캐시 자동 전환)"]
+            MW["Middleware\n(CorrelationID + 구조화 로그)"]
+        end
+        subgraph ADAPTERS["External Adapters"]
+            A_KAMIS["KAMIS API\n(농산물 시세)"]
+            A_PUBLIC["공공데이터포털\n(수산/축산/가공)"]
+            A_NAVER["네이버 API\n(뉴스 + 트렌드)"]
+            A_CRAWLER["NewsCrawler\n(정부 보도자료)"]
+            A_S3["S3 Client\n(문서 저장)"]
+        end
+    end
+
+    subgraph AWS["☁️ AWS Cloud Services"]
+        direction LR
+        BEDROCK["Amazon Bedrock\n(Claude 3.5 Sonnet)"]
+        KB["Bedrock\nKnowledge Bases\n(RAG)"]
+        GUARD["Bedrock\nGuardrails\n(환각 통제)"]
+        NEPTUNE["Amazon Neptune\n(온톨로지 그래프\n45 노드 / 30 엣지)"]
+        RDS["Amazon RDS\n(PostgreSQL 15\n시세/뉴스/마스터)"]
+        S3["Amazon S3\n(RAG 소스 문서)"]
+        LAMBDA["AWS Lambda\n(비동기 AI 처리)"]
+    end
+
+    subgraph EXTERNAL["🌐 External Data Sources"]
+        direction LR
+        EXT_KAMIS["KAMIS\n농산물유통정보"]
+        EXT_PUBLIC["공공데이터포털\n(6~7개 API)"]
+        EXT_NAVER["네이버\n검색/데이터랩"]
+        EXT_GOV["정부 보도자료\n(농식품부/해수부)"]
+    end
+
+    USER --> FRONTEND
+    FRONTEND -->|REST API| ROUTERS
+    CHAT -->|WebSocket| R_CHAT
+
+    R_PRICE --> S_PRICE
+    R_RECIPE --> S_RECIPE
+    R_NEWS --> S_NEWS
+    R_CHAT --> S_BEDROCK
+
+    S_PRICE --> CACHE
+    S_PRICE --> CB
+    CB --> A_KAMIS
+    CB --> A_PUBLIC
+    S_NEWS --> A_NAVER
+    S_NEWS --> A_CRAWLER
+    S_BEDROCK --> BEDROCK
+    S_BEDROCK --> KB
+    S_MENU --> LAMBDA
+
+    A_KAMIS --> EXT_KAMIS
+    A_PUBLIC --> EXT_PUBLIC
+    A_NAVER --> EXT_NAVER
+    A_CRAWLER --> EXT_GOV
+
+    S_PRICE --> RDS
+    S_NEWS --> RDS
+    S_RECIPE --> RDS
+    S_BEDROCK --> NEPTUNE
+    KB --> S3
+    A_S3 --> S3
+    BEDROCK --> GUARD
+    </div>
+    <p class="instructions">💡 이 페이지를 브라우저에서 열고 마우스 우클릭 → "이미지로 저장" 또는 스크린샷으로 PNG/SVG 이미지를 생성할 수 있습니다.</p>
+</body>
+</html>

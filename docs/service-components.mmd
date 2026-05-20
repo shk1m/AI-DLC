@@ -1,0 +1,88 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#7C3AED', 'primaryTextColor': '#fff', 'lineColor': '#8B5CF6'}}}%%
+flowchart LR
+    subgraph FE["🖥️ Frontend (Unit 1)"]
+        direction TB
+        FE01["FE-01<br/>DashboardLayout"]
+        FE02["FE-02<br/>PriceChart"]
+        FE03["FE-03<br/>CategoryFilter"]
+        FE04["FE-04<br/>PriceTable"]
+        FE05["FE-05<br/>CostSimulator"]
+        FE06["FE-06<br/>ChatBot"]
+        FE07["FE-07<br/>SubstituteRecommender"]
+    end
+
+    subgraph BE["⚙️ Backend Services (Unit 2)"]
+        direction TB
+        BE01["BE-01<br/>PriceService<br/>시세 조회 + Spike 감지"]
+        BE03["BE-03<br/>RecipeService<br/>레시피 + 원가 계산"]
+        BE05["BE-05<br/>NewsService<br/>뉴스 검색 + 크롤링"]
+    end
+
+    subgraph AI["🤖 AI/Data (Unit 3)"]
+        direction TB
+        BE02["BE-02<br/>ChatService<br/>LangChain Agent"]
+        BE04["BE-04<br/>SubstituteService<br/>온톨로지 추천"]
+        BE06["BE-06<br/>OntologyService<br/>Neptune 쿼리"]
+        BE07["BE-07<br/>LangChainAgent<br/>도구 오케스트레이션"]
+        LAMBDA["Lambda<br/>MenuGeneration<br/>비동기 AI 처리"]
+    end
+
+    subgraph INT["🔧 Integration (Unit 4)"]
+        direction TB
+        EXT04["EXT-04<br/>NewsCrawler<br/>정부 보도자료"]
+        DL04["DL-04<br/>S3 Client<br/>문서 저장소"]
+        CORE1["CircuitBreaker<br/>회로 차단기"]
+        CORE2["CacheManager<br/>캐시 관리"]
+        CORE3["Fallback<br/>장애 대응"]
+        CORE4["Middleware<br/>로깅 + 추적"]
+        TEST["Tests<br/>97 Unit Tests<br/>(PBT 포함)"]
+    end
+
+    subgraph DATA["💾 Data Layer"]
+        direction TB
+        DL01["DL-01<br/>PostgreSQL<br/>시세/뉴스/마스터"]
+        DL02["DL-02<br/>Neptune<br/>온톨로지 그래프"]
+        DL03["DL-03<br/>Bedrock KB<br/>RAG 벡터 검색"]
+        DL04B["DL-04<br/>S3<br/>문서/데이터"]
+    end
+
+    subgraph EXT["🌐 External"]
+        direction TB
+        EXT01["EXT-01<br/>KAMIS API"]
+        EXT02["EXT-02<br/>공공데이터포털"]
+        EXT03["EXT-03<br/>네이버 API"]
+    end
+
+    FE02 -->|REST| BE01
+    FE05 -->|REST| BE03
+    FE06 -->|WebSocket| BE02
+    FE07 -->|REST| BE04
+    FE04 -->|REST| BE01
+
+    BE01 --> CORE1
+    BE01 --> CORE2
+    CORE1 --> EXT01
+    CORE1 --> EXT02
+    BE05 --> EXT03
+    BE05 --> EXT04
+
+    BE02 --> BE07
+    BE07 --> BE01
+    BE07 --> BE03
+    BE07 --> BE04
+    BE07 --> BE05
+    BE04 --> BE06
+
+    BE01 --> DL01
+    BE05 --> DL01
+    BE06 --> DL02
+    BE02 --> DL03
+    DL04 --> DL04B
+    LAMBDA --> DL03
+
+    style FE fill:#DBEAFE,stroke:#2563EB,stroke-width:2px
+    style BE fill:#D1FAE5,stroke:#059669,stroke-width:2px
+    style AI fill:#EDE9FE,stroke:#7C3AED,stroke-width:2px
+    style INT fill:#FEF3C7,stroke:#D97706,stroke-width:2px
+    style DATA fill:#F3F4F6,stroke:#6B7280,stroke-width:2px
+    style EXT fill:#FEE2E2,stroke:#DC2626,stroke-width:2px
